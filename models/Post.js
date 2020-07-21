@@ -1,8 +1,5 @@
 const postsCollection = require("../db").db().collection("posts")
-const followsCollection = require("../db").db().collection("follows")
 const ObjectID = require("mongodb").ObjectID
-const User = require("./User")
-const sanitizeHTML = require("sanitize-html")
 const { post } = require("../router")
 
 let Post = function (data, userid, requestedPostId) {
@@ -12,13 +9,7 @@ let Post = function (data, userid, requestedPostId) {
   this.requestedPostId = requestedPostId
 }
 
-Post.prototype.cleanUp = function () {
-  if (typeof this.data.title != "string") {
-    this.data.title = ""
-  }
-  if (typeof this.data.body != "string") {
-    this.data.body = ""
-  }
+
 
   // get rid of any bogus properties
   this.data = {
@@ -29,14 +20,7 @@ Post.prototype.cleanUp = function () {
   }
 }
 
-Post.prototype.validate = function () {
-  if (this.data.title == "") {
-    this.errors.push("You must provide a title.")
-  }
-  if (this.data.body == "") {
-    this.errors.push("You must provide post content.")
-  }
-}
+
 
 Post.prototype.create = function () {
   return new Promise((resolve, reject) => {
@@ -132,9 +116,6 @@ Post.getAllPosts = function () {
   })
 }
 
-Post.findByAuthorId = function (authorId) {
-  return Post.reusablePostQuery([{ $match: { author: authorId } }, { $sort: { createdDate: -1 } }])
-}
 
 Post.delete = function (postIdToDelete) {
   postsCollection.deleteOne({ _id: new ObjectID(postIdToDelete) })
@@ -151,22 +132,8 @@ Post.search = function (searchTerm) {
   })
 }
 
-Post.countPostsByAuthor = function (id) {
-  return new Promise(async (resolve, reject) => {
-    let postCount = await postsCollection.countDocuments({ author: id })
-    resolve(postCount)
-  })
-}
 
-Post.getFeed = async function (id) {
-  // create an array of the user ids that the current user follows
-  let followedUsers = await followsCollection.find({ authorId: new ObjectID(id) }).toArray()
-  followedUsers = followedUsers.map(function (followDoc) {
-    return followDoc.followedId
-  })
 
-  // look for posts where the author is in the above array of followed users
-  return Post.reusablePostQuery([{ $match: { author: { $in: followedUsers } } }, { $sort: { createdDate: -1 } }])
-}
+
 
 module.exports = Post
