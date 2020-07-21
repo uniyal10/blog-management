@@ -4,7 +4,7 @@ const cors = require("cors")
 
 apiRouter.use(cors())
 
-apiRouter.get("/", (req, res) => res.json("Hello, if you see this message that means your backend is up and running successfully. Congrats! Now let's continue learning React!"))
+apiRouter.get("/", (req, res) => res.json("blog management running..."))
 
 
 apiRouter.get("/post/:id", postController.reactApiViewSingle)
