@@ -1,18 +1,18 @@
 const Post = require("../models/Post")
 
-exports.apiCreate = function(req, res) {
+exports.apiCreate = function (req, res) {
   let post = new Post(req.body, req.apiUser._id)
   post
     .create()
-    .then(function(newId) {
+    .then(function (newId) {
       res.json(newId)
     })
-    .catch(function(errors) {
+    .catch(function (errors) {
       res.json(errors)
     })
 }
 
-exports.apiUpdate = function(req, res) {
+exports.apiUpdate = function (req, res) {
   let post = new Post(req.body, req.apiUser._id, req.params.id)
   post
     .update()
@@ -32,17 +32,11 @@ exports.apiUpdate = function(req, res) {
     })
 }
 
-exports.apiDelete = function(req, res) {
-  Post.delete(req.params.id, req.apiUser._id)
-    .then(() => {
-      res.json("Success")
-    })
-    .catch(e => {
-      res.json("You do not have permission to perform that action.")
-    })
+exports.apiDelete = function (req, res) {
+  console.log(req.params.id)
 }
 
-exports.search = function(req, res) {
+exports.search = function (req, res) {
   Post.search(req.body.searchTerm)
     .then(posts => {
       res.json(posts)
@@ -52,11 +46,7 @@ exports.search = function(req, res) {
     })
 }
 
-exports.reactApiViewSingle = async function(req, res) {
-  try {
-    let post = await Post.findSingleById(req.params.id, 0)
-    res.json(post)
-  } catch (e) {
-    res.json(false)
-  }
+exports.getAllPosts = async function (req, res) {
+  let post = await Post.getAllPosts()
+  res.json(post)
 }
